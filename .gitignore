@@ -10,6 +10,7 @@
 
 # IDEs
 .idea/
+build/
 
 # Lockfiles
 package-lock.json
