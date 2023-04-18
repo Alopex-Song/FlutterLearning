@@ -1,9 +1,6 @@
 .DS_Store
 .packages
 
-# */**/android
-# */**/ios
-# */**/.gitignore
 .metadata
 ..gitignore.un~
 .dart_tool/
