@@ -4,8 +4,8 @@
 # */**/android
 # */**/ios
 # */**/.gitignore
-*/**/.metadata
-
+.metadata
+..gitignore.un~
 .dart_tool/
 
 # IDEs
