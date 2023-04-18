@@ -1,0 +1,8 @@
+version: "Apple Swift version 5.8 (swiftlang-5.8.0.124.2 clang-1403.0.22.11.100)"
+options: "c8291f7667eee5a4b806a9d0a5052a78f6bae3aa290c18d62cb42c9136e23721"
+build_start_time: [1681725090, 786732000]
+build_end_time: [1681725092, 138431000]
+inputs:
+  "/Users/jonny.s/Project/flutter test project/flutter_learning_001/macos/Flutter/GeneratedPluginRegistrant.swift": [1681725083, 827331434]
+  "/Users/jonny.s/Project/flutter test project/flutter_learning_001/macos/Runner/AppDelegate.swift": [1681056024, 786752200]
+  "/Users/jonny.s/Project/flutter test project/flutter_learning_001/macos/Runner/MainFlutterWindow.swift": [1681056024, 787912700]
