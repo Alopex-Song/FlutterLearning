@@ -44,9 +44,9 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void dismissFav(String title) {
-    if (favorites.contains(title)) {
-      favorites.remove(title);
+  void dismissFav(int index) {
+    if (favorites.length > index) {
+      favorites.removeAt(index);
       notifyListeners();
     }
   }
@@ -102,28 +102,33 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class FavoritePage extends StatelessWidget {
+class FavoritePage extends StatefulWidget {
+  @override
+  State<FavoritePage> createState() => _FavoritePageState();
+}
+
+class _FavoritePageState extends State<FavoritePage> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
 
-    return ListView(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text('You have '
-              '${appState.favorites.length} favorites:'),
+    var items = appState.favorites.map((e) => e.asLowerCase).toList();
+
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) => Dismissible(
+        key: Key(items[index]),
+        onDismissed: (direction) {
+          // setState(() {
+          //   items.removeAt(index);
+          // });
+          appState.dismissFav(index);
+        },
+        child: ListTile(
+          leading: Icon(Icons.favorite),
+          title: Text(items[index]),
         ),
-        for (var pair in appState.favorites)
-          ListTile(
-            leading: Icon(Icons.favorite),
-            title: Text(pair.asLowerCase),
-            onTap: () {
-              appState.dismissFav(pair.asLowerCase);
-            },
-          ),
-        // appState.favorites.map((e) => Text(e.asLowerCase)).toList()
-      ],
+      ),
     );
   }
 }
