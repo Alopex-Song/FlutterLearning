@@ -2,9 +2,7 @@ import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -62,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var colorScheme = Theme.of(context).colorScheme;
     Widget page;
 
     if (selectedIndex == 0) {
@@ -72,32 +71,49 @@ class _MyHomePageState extends State<MyHomePage> {
       throw UnimplementedError("No widget for $selectedIndex");
     }
 
+    var mainArea = ColoredBox(
+      color: colorScheme.surfaceVariant,
+      child: AnimatedSwitcher(
+        duration: Duration(milliseconds: 100),
+        transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child,),
+
+        child: page,
+      ),
+    );
+
     return LayoutBuilder(builder: (context, contraints) {
       return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            title: const Text(
+              "Flutter Learning 001",
+              style: TextStyle(color: Colors.redAccent),
+            ),
+          ),
           body: Row(
-        children: [
-          SafeArea(
-              child: NavigationRail(
-            extended: contraints.maxWidth >= 600,
-            destinations: [
-              NavigationRailDestination(
-                  icon: Icon(Icons.home), label: Text('Home')),
-              NavigationRailDestination(
-                  icon: Icon(Icons.favorite), label: Text('Like'))
+            children: [
+              SafeArea(
+                  child: NavigationRail(
+                extended: contraints.maxWidth >= 600,
+                destinations: [
+                  NavigationRailDestination(
+                      icon: Icon(Icons.home), label: Text('Home')),
+                  NavigationRailDestination(
+                      icon: Icon(Icons.favorite), label: Text('Like'))
+                ],
+                selectedIndex: selectedIndex,
+                onDestinationSelected: (value) {
+                  setState(() {
+                    selectedIndex = value;
+                  });
+                },
+              )),
+              Expanded(
+                  child: Container(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      child: mainArea))
             ],
-            selectedIndex: selectedIndex,
-            onDestinationSelected: (value) {
-              setState(() {
-                selectedIndex = value;
-              });
-            },
-          )),
-          Expanded(
-              child: Container(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  child: page))
-        ],
-      ));
+          ));
     });
   }
 }
@@ -152,6 +168,9 @@ class GeneratorPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          SizedBox(
+            height: 10,
+          ),
           BigCard(pair: pair),
           SizedBox(
             height: 10,
@@ -200,10 +219,20 @@ class BigCard extends StatelessWidget {
       color: Theme.of(context).colorScheme.primary,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Text(
-          pair.asLowerCase,
-          style: style,
-          semanticsLabel: "${pair.first} ${pair.second}",
+        child: AnimatedSize(
+          duration: Duration(milliseconds: 200),
+          child: MergeSemantics(
+            child: Wrap(children: [
+              Text(
+                pair.first,
+                style: style.copyWith(fontWeight: FontWeight.w200),
+              ),
+              Text(
+                pair.second,
+                style: style.copyWith(fontWeight: FontWeight.bold),
+              )
+            ]),
+          ),
         ),
       ),
     );
