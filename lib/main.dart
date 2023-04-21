@@ -25,18 +25,26 @@ class MyApp extends StatelessWidget {
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
 
+  var allpairs = <WordPair>[];
+
+  GlobalKey? allpairsKey;
+
   void getNext() {
+    allpairs.insert(0, current);
+    var animationList = allpairsKey?.currentState as AnimatedListState?;
+    animationList?.insertItem(0);
     current = WordPair.random();
     notifyListeners();
   }
 
   var favorites = <WordPair>[];
 
-  void toggleFavorite() {
-    if (favorites.contains(current)) {
-      favorites.remove(current);
+  void toggleFavorite([WordPair? pair]) {
+    pair = pair ?? current;
+    if (favorites.contains(pair)) {
+      favorites.remove(pair);
     } else {
-      favorites.add(current);
+      favorites.add(pair);
     }
 
     notifyListeners();
@@ -75,8 +83,10 @@ class _MyHomePageState extends State<MyHomePage> {
       color: colorScheme.surfaceVariant,
       child: AnimatedSwitcher(
         duration: Duration(milliseconds: 100),
-        transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child,),
-
+        transitionBuilder: (child, animation) => ScaleTransition(
+          scale: animation,
+          child: child,
+        ),
         child: page,
       ),
     );
@@ -130,21 +140,49 @@ class _FavoritePageState extends State<FavoritePage> {
 
     var items = appState.favorites.map((e) => e.asLowerCase).toList();
 
-    return ListView.builder(
-      itemCount: items.length,
-      itemBuilder: (context, index) => Dismissible(
-        key: Key(items[index]),
-        onDismissed: (direction) {
-          // setState(() {
-          //   items.removeAt(index);
-          // });
-          appState.dismissFav(index);
-        },
-        child: ListTile(
-          leading: Icon(Icons.favorite),
-          title: Text(items[index]),
-        ),
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+            padding: const EdgeInsets.all(
+              30.0,
+            ),
+            child: Text(items.isNotEmpty
+                ? 'You\'ve got ${items.length} favorites:'
+                : "No favorites!")),
+        Expanded(
+            child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 400, childAspectRatio: 400 / 80),
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading: IconButton(
+                      icon: Icon(Icons.delete_outline, semanticLabel: "Delete",),
+                      color: Theme.of(context).colorScheme.primary,
+                      onPressed: () => appState.dismissFav(index),
+                    ),
+                    title: Text(items[index]),
+                  );
+                })
+            // child: ListView.builder(
+            //   itemCount: items.length,
+            //   itemBuilder: (context, index) => Dismissible(
+            //     key: Key(items[index]),
+            //     onDismissed: (direction) {
+            //       // setState(() {
+            //       //   items.removeAt(index);
+            //       // });
+            //       appState.dismissFav(index);
+            //     },
+            //     child: ListTile(
+            //       leading: Icon(Icons.favorite),
+            //       title: Text(items[index]),
+            //     ),
+            //   ),
+            // ),
+            ),
+      ],
     );
   }
 }
@@ -168,6 +206,7 @@ class GeneratorPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Expanded(flex: 3, child: HistoryListView()),
           SizedBox(
             height: 10,
           ),
@@ -194,7 +233,8 @@ class GeneratorPage extends StatelessWidget {
                   },
                   child: Text('Next')),
             ],
-          )
+          ),
+          Spacer(flex: 2),
         ],
       ),
     );
@@ -234,6 +274,59 @@ class BigCard extends StatelessWidget {
             ]),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class HistoryListView extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _HistoryListViewPageState();
+}
+
+class _HistoryListViewPageState extends State<HistoryListView> {
+  final _key = GlobalKey();
+
+  static const Gradient _maskingGradient = LinearGradient(
+      colors: [Colors.transparent, Colors.black],
+      stops: [0.0, 0.5],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter);
+
+  @override
+  Widget build(BuildContext context) {
+    final appState = context.watch<MyAppState>();
+    appState.allpairsKey = _key;
+
+    return ShaderMask(
+      shaderCallback: (bounds) => _maskingGradient.createShader(bounds),
+      blendMode: BlendMode.dstIn,
+      child: AnimatedList(
+        key: _key,
+        reverse: true,
+        initialItemCount: appState.allpairs.length,
+        itemBuilder: (context, index, animation) {
+          final pair = appState.allpairs[index];
+          return SizeTransition(
+              sizeFactor: animation,
+              child: Center(
+                child: TextButton.icon(
+                  onPressed: () {
+                    appState.toggleFavorite(pair);
+                  },
+                  icon: appState.favorites.contains(pair)
+                      ? Icon(
+                          Icons.favorite,
+                          size: 12,
+                        )
+                      : SizedBox(),
+                  label: Text(
+                    pair.asLowerCase,
+                    semanticsLabel: pair.asPascalCase,
+                  ),
+                ),
+              ));
+        },
       ),
     );
   }
