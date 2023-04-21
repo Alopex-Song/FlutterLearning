@@ -148,7 +148,7 @@ class _FavoritePageState extends State<FavoritePage> {
               30.0,
             ),
             child: Text(items.isNotEmpty
-                ? 'You\'ve got ${items.length} favorites:'
+                ? 'You\'ve got ${items.length} favorite${items.length > 1 ? 's' : ''}:'
                 : "No favorites!")),
         Expanded(
             child: GridView.builder(
@@ -165,22 +165,6 @@ class _FavoritePageState extends State<FavoritePage> {
                     title: Text(items[index]),
                   );
                 })
-            // child: ListView.builder(
-            //   itemCount: items.length,
-            //   itemBuilder: (context, index) => Dismissible(
-            //     key: Key(items[index]),
-            //     onDismissed: (direction) {
-            //       // setState(() {
-            //       //   items.removeAt(index);
-            //       // });
-            //       appState.dismissFav(index);
-            //     },
-            //     child: ListTile(
-            //       leading: Icon(Icons.favorite),
-            //       title: Text(items[index]),
-            //     ),
-            //   ),
-            // ),
             ),
       ],
     );
